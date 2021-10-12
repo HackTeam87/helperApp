@@ -47,6 +47,9 @@
                                 <v-col cols="12" sm="3" v-for="(c, index) in port_onu_count" :key="index">
                                     <v-card class="pa-2" outlined tile  >
                                         <v-icon center :color="getColor(c.pon_status)">mdi-sitemap mdi-24px </v-icon>
+                                        <div class="text-caption">
+                                           status online 
+                                        </div>
                                         <v-slider
                                                 v-model="c.onu_count"
                                                 :label="c.port_id"
@@ -102,7 +105,7 @@
                                 <v-text-field
                                         v-model="search"
                                         append-icon="mdi-magnify"
-                                        label="Filter (onu,mac,signal,len)"
+                                        label="port-id,mac-address,serial,signal,distance"
                                         single-line
                                         hide-details
                                 ></v-text-field>
@@ -139,7 +142,7 @@
                                         <td class="text-left"><span
                                                 v-if="item.onu_lenght !== '0'">{{ item.onu_lenght}} m</span>
                                         </td>
-                                        <td class="text-left">{{ item.mac}}</td>
+                                        <td class="text-left">{{ item.onu_mac_serial}}</td>
                                         <td class="text-left">
                                             <div style='overflow-y: auto; max-height: 80px;'>
                                                 <span v-for="(um, index) in item.user_mac" :key="index">{{ um }}<br></span>
@@ -160,7 +163,7 @@
                                         <template v-slot:default="dialog">
                                             <v-card>
                                                 <v-toolbar color="error" dark>
-                                                    do you really want to delete onu   {{item.port}} {{item.mac}}?
+                                                    do you really want to delete onu   {{item.port}} {{item.onu_mac_serial}}?
                                                 </v-toolbar>
                                                 <v-card-actions class="justify-end">
                                                     <v-btn text
@@ -180,8 +183,7 @@
                                     </v-dialog>
     
                                         </td>
-                                        <td class="text-left"><span
-                                            v-if="item.onu_lenght !== '0'">{{ item.onu_desc}}</span>
+                                        <td class="text-left"><span>{{ item.onu_desc}}</span>
                                     </td>
                                     </tr>
     
@@ -255,7 +257,7 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                     {text: 'up/down', width: "10%", show: true, value: ''},
                     {text: 'rx', width: "11%", show: true, value: ''},
                     {text: 'dist', width: "14%", show: true, value: ''},
-                    {text: 'onu_mac', width: "10%", show: true, value: ''},
+                    {text: 'mac/serial', width: "10%", show: true, value: ''},
                     {text: 'user_mac', width: "10%", show: true, value: ''},
                     {text: 'del', width: "10%", show: true, value: ''},
                     {text: 'desc', width: "25%", show: true, value: ''},
@@ -394,7 +396,7 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
             computed: {
             filteredItems() {
                 return this.all_info.filter((i) => {
-                    return !this.search || (i.port + '||' + i.mac + '||' + i.user_mac + '||' + i.onu_signal + '||' + i.onu_lenght)
+                    return !this.search || (i.port + '||' + i.onu_mac_serial + '||' + i.user_mac + '||' + i.onu_signal + '||' + i.onu_lenght)
                         .toUpperCase().indexOf(this.search.toUpperCase()) !== -1
                 })
             }}

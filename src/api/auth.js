@@ -14,6 +14,13 @@ export default function (instance) {
                 return instance.get('/mikrotik/api/mikrotik/detail?ip=' + link)
             }
         },
+        MikrotikApi(ip, command) {
+            if (ip != undefined) {
+                return instance.get('/mikrotik/api/mikrotik/api?ip=' + ip + '&command=' + command)
+            } else {
+                return instance.get('/mikrotik/api/mikrotik/api?ip=' + ip)
+            }
+        },
         OltBase(link, Interface) {
             if (Interface != undefined) {
                 return instance.get('/api/olt/base?ip=' + link + '&interface=' + Interface)

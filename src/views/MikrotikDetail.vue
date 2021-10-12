@@ -3,7 +3,7 @@
  <v-container>
    <v-row  no-gutters v-for="(i, index) in base_info" :key="index">
                       <v-col cols12 sm12>
-                     <v-list-group :value="true" prepend-icon="mdi-router-network">
+                     <v-list-group :value="false" prepend-icon="mdi-router-network">
 
                                  <template v-slot:activator>
                                 <v-list-item-title> <span>{{i.indentity}}</span></v-list-item-title>
@@ -47,7 +47,7 @@
                  <v-row  no-gutters >
                       <v-col cols12 sm12>
 
-                          <v-list-group :value="true" prepend-icon="mdi-access-point-network">
+                          <v-list-group :value="false" prepend-icon="mdi-access-point-network">
 
                                  <template v-slot:activator>
                                 <v-list-item-title> <span>Interface or Vlan</span></v-list-item-title>
@@ -64,7 +64,91 @@
                     
                         </v-col>
                 </v-row>
+
+
+
+                
   </v-container>
+  <v-container>
+    <v-card >
+
+                       <v-card-title>
+                                <span class="colors-blue">D-Dynamic</span>
+                                 <v-spacer></v-spacer>
+                                <span class="colors-violet">R-Radius</span>
+                                 <v-spacer></v-spacer>
+                                <span class="colors-black">B-Blocked</span>
+                                 <v-spacer></v-spacer>
+                                <span class="colors-gray">X-Disabled</span>
+                                 <v-spacer></v-spacer>
+                                <span class="colors-black">S-Static</span>
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                        v-model="search"
+                                        append-icon="mdi-magnify"
+                                        label="ip,mac-address,host,comment"
+                                        single-line
+                                        hide-details
+                                ></v-text-field>
+                            </v-card-title>
+                           
+                            <v-data-table
+                                    primary
+                                    mobile-breakpoint="0"
+                                    :headers="headers"
+                                    :items="filteredItems"
+                                    item-key="id"
+                                    sort-by="active-address"
+                                    class="elevation-1"
+                                    :footer-props="footerProps"
+                            >
+    
+                                <template v-slot:body="{ items }">
+    
+                                    <tbody>
+                                    <tr v-for="(item,index) in items" :key="index">
+
+                                        <td class="text-left">
+                                             <span v-if="item['dynamic'] === 'true'" class="colors-blue">D</span>
+                                             <span v-else class="colors-black">S</span>
+                                             <span v-if="item['radius'] === 'true'" class="colors-violet">R</span>
+                                             <span v-if="item['blocked'] === 'true'" class="colors-black">B</span>
+                                             <span v-if="item['disabled'] === 'true'" class="colors-gray">X</span>
+                                        </td>
+                                        <td class="text-left">{{ item['host-name'] }}</td>
+                                        <td class="text-left">{{ item['address'] }}</td>
+                                        <td class="text-left">{{ item['mac-address'] }}</td>
+                                        <td class="text-left">{{ item['server'] }}</td>
+                                        <td class="text-left" >
+                                            <span v-if="item['status'] === 'bound'" class="colors-green"> {{ item['status'] }}</span>
+                                            <span v-else class="colors-red"> {{ item['status'] }}</span>
+                                        </td>
+                                        <td class="text-left">{{ item['last-seen'] }}</td>
+                                        <td class="text-left">{{ item['expires-after'] }}</td>
+                                        <td class="text-left">{{ item['comment'] }}</td>
+                                        <td class="text-left">{{ item['dhcp-option'] }}</td>
+                                        <td class="text-left">{{ item['address-lists'] }}</td>
+                                   
+                                       
+                                    </tr>
+                                </tbody>
+                            </template>
+    
+    
+                            </v-data-table>
+                        </v-card>
+
+                         <v-btn fab dark fixed bottom left color="green"
+                           @click="BackToHome()">
+                        <v-icon>mdi-arrow-collapse-left</v-icon>
+                    </v-btn>
+
+                    <v-btn v-scroll="onScroll" v-show="fab" fab
+                           dark fixed bottom right color="green"
+                           @click="toTop">
+                        <v-icon>mdi-arrow-up</v-icon>
+                    </v-btn>
+         </v-container>
     </div>
 </template>
 
@@ -72,10 +156,35 @@
   export default {
     data() {
             return {
+    footerProps: {'items-per-page-options': [300, 500, -1]},
     search: '',
+    fab: false,
     deviceIp: '',
     base_info: [],
     detail_info: [],
+    api_info: [],
+    headers: [      
+                    {text: 'flags', width: "5%", show: true, value: ''},
+                    {text: 'host-name', width: "10%", show: true, value: ''},
+                    {text: 'address', width: "10%", show: true, value: ''},
+                    {text: 'mac-address', width: "10%", show: true, value: ''},
+                    {text: 'server', width: "10%", show: true, value: ''},
+                    {text: 'status', width: "5%", show: true, value: ''},
+                    {text: 'last-seen', width: "10%", show: true, value: ''},
+                    {text: 'expires-after', width: "10%", show: true, value: ''},
+                    {text: 'comment', width: "10%", show: true, value: ''},
+                    {text: 'dhcp-option', width: "10%", show: true, value: ''},
+                    {text: 'address-lists', width: "10%", show: true, value: ''},
+                    
+
+                    //  {text: 'active-address', width: "6%", show: true, value: ''},
+                    // {text: 'active-client-id', width: "6%", show: true, value: ''},
+                    // {text: 'active-mac-address', width: "6%", show: true, value: ''},
+                    // {text: 'active-server', width: "6%", show: true, value: ''},
+                    // {text: 'client-id', width: "6%", show: true, value: ''},
+                                   
+                    
+    ]
     }
     },
 
@@ -84,6 +193,7 @@
             if (this.deviceIp !== "") {
                 this.GetInfo();
                 this.GetInfoDetail();
+                this.GetInfoApi();
             }},
        methods: {
             async GetInfo() {
@@ -102,6 +212,21 @@
                 this.detail_info = response2.data.data
             },
 
+             async GetInfoApi() {
+              
+                const response3 = await this.$api.auth.MikrotikApi(this.deviceIp, '/ip/dhcp-server/lease/').catch(() => {
+                    this.error = 'ERROR'
+                })
+                this.api_info = response3.data.data
+                // console.log(this.api_info)
+                // for (const [key, value] of Object.entries(this.api_info[0])) {
+                //     console.log(`${key}`)
+                //     this.headers.push({'text': `${key}`})
+                //      console.log(this.headers);
+                //     }
+                
+            },
+
              getIpFromQuery() {
                 console.log(this.$route);
                 if (typeof this.$route.query.ip !== 'undefined') {
@@ -114,6 +239,27 @@
             setDeviceIp: function (ip) {
                 console.log("New deviceIP setted: " + ip);
                 this.deviceIp = ip;
+            },
+              onScroll(e) {
+                if (typeof window === 'undefined') return
+                const top = window.pageYOffset || e.target.scrollTop || 0
+                this.fab = top > 20
+            },
+             toTop() {
+                this.$vuetify.goTo(0)
+            },
+            BackToHome() {
+                window.open('https://switcher.golden.net.ua/mikrotik/', "_self");
+            },
+
+            setFlags: function (d) {
+                if (d === '10000000') return '<span style="color: darkgreen">10-Full</span>';
+                if (d === '100000000') return '<span style="color: darkgreen">100-Full</span>';
+                if (d === '1000000000') return '<span style="color: darkgreen">1G-Full</span>';
+                if (d === '4294967295') return '<span style="color: darkgreen">10G-Full</span>';
+                if (d === '0') return '<span style="color: darkgray; font-weight: bold">Down</span>';
+
+                return d;
             },
        },
 
@@ -128,7 +274,53 @@
 
                 console.log(route)
             },},
+
+             computed: {
+            filteredItems() {
+                return this.api_info.filter((i) => {
+                    return !this.search || (i['address'] + '||' + i['mac-address'] + '||' + i['host-name'] + '||' + i['comment'])
+                        .toUpperCase().indexOf(this.search.toUpperCase()) !== -1
+                })
+            }}
            
   }
 </script>
+
+<style scoped>
+
+    .no-dispays {
+        display: none;
+    }
+
+    .colors-black {
+        color: #2b2b2b;
+    }
+
+    .colors-red {
+        color: red;
+    }
+
+    .colors-gray {
+        color: gray;
+    }
+
+    .colors-blue {
+        color: dodgerblue;
+
+
+    }
+
+    .colors-violet {
+        color: blueviolet;
+
+
+    }
+
+    .colors-green {
+        color: green;
+
+
+    }
+</style>
+
 
