@@ -73,7 +73,6 @@
 
                                 <v-col cols="12" sm="2" v-for="(eth, index) in eth_info" :key="index">
                                     <v-card class="pa-2" outlined tile>
-                                      
                                             <v-icon :color="getColor(eth.eth_status)">mdi-ethernet mdi-24px</v-icon>
                                         {{eth.eth_name}}
                                     </v-card>
@@ -87,7 +86,7 @@
                              <v-container >
                             <v-row align="center" justify="space-around">
 
-                                <v-btn block dark class="ma-2"  color="green" @click="GetTree()">
+                                <v-btn block dark class="ma-2"  color="green" @click="GetTree()" v-if="!tree">
                                     tree update
                                      <v-icon center>mdi-share</v-icon>
                                 </v-btn>
@@ -100,15 +99,38 @@
                         
 
                         <v-card v-if="tree">
+                            
                             <v-card-title>
-                                <v-spacer></v-spacer>
-                                <v-text-field
+                                 <v-text-field
                                         v-model="search"
                                         append-icon="mdi-magnify"
                                         label="port-id,mac-address,serial,signal,distance"
                                         single-line
                                         hide-details
                                 ></v-text-field>
+
+                                 
+                                 <v-spacer></v-spacer>
+                               <v-spacer>
+                                     <v-chip class="ma-2"  color="blue-grey" label outlined >
+                                          total onu: {{this.all_info.length}}
+                                     </v-chip>
+                                </v-spacer>
+                                <v-spacer>
+                                     <v-chip class="ma-2"  color="green" label outlined >
+                                          online onu: {{this.Test}}
+                                     </v-chip>
+                                </v-spacer>
+                                
+                                 <v-spacer>
+                                      <v-btn block dark  color="green" @click="GetTree()" >
+                                    tree update
+                                     <v-icon center>mdi-share</v-icon>
+                                </v-btn>
+                                </v-spacer>
+                               
+
+                               
                             </v-card-title>
                             <v-data-table
                                     primary
@@ -143,11 +165,52 @@
                                                 v-if="item.onu_lenght !== '0'">{{ item.onu_lenght}} m</span>
                                         </td>
                                         <td class="text-left">{{ item.onu_mac_serial}}</td>
+
                                         <td class="text-left">
                                             <div style='overflow-y: auto; max-height: 80px;'>
                                                 <span v-for="(um, index) in item.user_mac" :key="index">{{ um }}<br></span>
                                             </div>  
                                           </td>
+
+                                           
+                                        <td class="text-left"><span>{{ item.onu_desc}}</span>
+                                    </td>
+                                        <td>
+                                            <v-dialog
+                                        transition="dialog-top-transition"
+                                        max-width="600"
+                                >
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn color="primary" v-bind="attrs" v-on="on">
+                                            <v-icon>
+                                                mdi-reload
+                                            </v-icon>
+                                            
+                                        </v-btn>
+                                    </template>
+                                    <template v-slot:default="dialog">
+                                        <v-card>
+                                            <v-toolbar color="primary" dark>
+                                                do you really want to reboot onu {{item.port}} {{item.onu_mac_serial}}?
+                                            </v-toolbar>
+                                            <v-card-actions class="justify-end">
+                                                <v-btn text
+                                                       @click="RebootOnu(item.id) , dialog.value = false"
+                                                >
+                                                    Reboot
+                                                </v-btn>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                        text
+                                                        @click="dialog.value = false"
+                                                >Close
+                                                </v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </template>
+                                </v-dialog>
+                                        </td>
+                                          
                                         <td>
     
     
@@ -181,10 +244,10 @@
                                             </v-card>
                                         </template>
                                     </v-dialog>
+                                    
     
                                         </td>
-                                        <td class="text-left"><span>{{ item.onu_desc}}</span>
-                                    </td>
+                                    
                                     </tr>
     
                                     </tbody>
@@ -195,12 +258,15 @@
                             </v-data-table>
                         </v-card>
 
-                    
-                     
-                        <v-container >
+               <v-container >
 
-                            <v-row no-gutters>
-
+                            
+                             <v-list-group :value="list_group" >
+                                  <template v-slot:activator>
+                                <v-list-item-title> <span>{{base_info[0]['desc']}}</span></v-list-item-title>
+                                     </template>
+                                
+                                 <v-row no-gutters>
                                 <v-col cols="12" sm="2" v-for="(a, index) in base_info" :key="index">
                                     <v-card class="pa-2" outlined tile>
                                         <h5>{{a.desc}}</h5>
@@ -211,8 +277,14 @@
                                         <h5>{{a.free_mem}}</h5>
                                     </v-card>
                                 </v-col>
-                            </v-row>
+                                 </v-row>
+                               </v-list-group>
+                           
+                            
                         </v-container>
+
+                       
+                     
 
 
                     </v-card>
@@ -252,6 +324,7 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                 search: '',
                 deviceIp: '',
                 tree: false,
+                Test: '',
                 footerProps: {'items-per-page-options': [150, 250, -1]},
                 headers: [
                     {text: 'up/down', width: "10%", show: true, value: ''},
@@ -259,8 +332,9 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                     {text: 'dist', width: "14%", show: true, value: ''},
                     {text: 'mac/serial', width: "10%", show: true, value: ''},
                     {text: 'user_mac', width: "10%", show: true, value: ''},
-                    {text: 'del', width: "10%", show: true, value: ''},
                     {text: 'desc', width: "25%", show: true, value: ''},
+                    {text: 'reboot', width: "10%", show: true, value: ''},
+                    {text: 'del', width: "10%", show: true, value: ''},
                 ],
                 ex3: {label: 'thumb-color', val: 50, color: 'red'},
                 base_info: [],
@@ -293,7 +367,14 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                     this.error = 'ERROR'
                 })
                 this.port_onu_count = response3.data.data
-                this.loading = false
+                
+                let test = parseInt(0);
+                for (let i = 0; i < this.port_onu_count.length; i++) {
+                  test = test + parseInt(this.port_onu_count[i].onu_count)
+                  }
+                  
+                 this.Test = test
+                 this.loading = false
             },
 
          async GetTree(){
@@ -304,7 +385,7 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                 })
                 this.all_info = response4.data.data
                 this.list_group = false
-            this.loading = false    
+            this.loading = false   
          },
          async DeleteOnu(OnuId) {
              const response5 = await this.$api.auth.OnuDelete(this.deviceIp, OnuId).catch(() => {
@@ -322,6 +403,22 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                         }, 5000)
                     }
          },
+           async RebootOnu(OnuId) {
+             const response8 = await this.$api.auth.OnuReboot(this.deviceIp, OnuId).catch(() => {
+                    this.error = 'ERROR'
+                })
+                
+              if (response8.status === 200) {
+                        sound.play()
+                        this.alert['value'] = true
+                        this.alert['color'] = 'cyan'
+                        this.alert['message'] = 'onu successfully rebooted'
+                        window.setInterval(() => {
+                            this.alert['value'] = false;
+                            console.log("hide alert after 5 seconds");
+                        }, 5000)
+                    }
+         },    
          showOnuDetail(OnuId) {
             
                 this.$router.push({name: 'ont', query: {ip: this.deviceIp, onu: OnuId,}})
@@ -396,7 +493,8 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
             computed: {
             filteredItems() {
                 return this.all_info.filter((i) => {
-                    return !this.search || (i.port + '||' + i.onu_mac_serial + '||' + i.user_mac + '||' + i.onu_signal + '||' + i.onu_lenght)
+                    return !this.search || (i.port + '||' + i.onu_mac_serial + '||' + i.user_mac + '||' + 
+                           i.onu_signal + '||' + i.onu_lenght + '||' + i.onu_desc)
                         .toUpperCase().indexOf(this.search.toUpperCase()) !== -1
                 })
             }}
