@@ -20,104 +20,6 @@
                 </div>
 
 
-                <v-row class="mb-6" no-gutters>
-                    <v-alert
-                            dark
-                            v-model="alert.value"
-                            border="left"
-                            elevation="2"
-                            colored-border
-                            icon="mdi-twitter"
-                            transition="slide-x-transition"
-                            style="width: 60%;position: absolute;z-index: 999;text-align: center;"
-                            :color="alert.color"
-                    >
-                        {{alert.message}}
-                    </v-alert>
-
-                    <v-col cols12 sm12>
-
-                        <v-card class="pa-2" outlined tile hover data-aos="zoom-in" data-aos-easing="ease">
-
-
-                            <v-row align="center" justify="space-between">
-
-
-                                
-
-                                <v-dialog
-                                        transition="dialog-top-transition"
-                                        max-width="600"
-                                >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn color="primary" v-bind="attrs" v-on="on">
-                                            <v-icon>
-                                                mdi-reload
-                                            </v-icon>
-                                            reboot
-                                        </v-btn>
-                                    </template>
-                                    <template v-slot:default="dialog">
-                                        <v-card>
-                                            <v-toolbar color="primary" dark>
-                                                do you really want to reboot onu?
-                                            </v-toolbar>
-                                            <v-card-actions class="justify-end">
-                                                <v-btn text
-                                                       @click="RebootOnu() , dialog.value = false"
-                                                >
-                                                    Reboot
-                                                </v-btn>
-                                                <v-spacer></v-spacer>
-                                                <v-btn
-                                                        text
-                                                        @click="dialog.value = false"
-                                                >Close
-                                                </v-btn>
-                                            </v-card-actions>
-                                        </v-card>
-                                    </template>
-                                </v-dialog>
-
-                                <v-dialog
-                                        transition="dialog-top-transition"
-                                        max-width="600"
-                                >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn color="error" v-bind="attrs" v-on="on" >
-                                            <v-icon>
-                                                mdi-delete
-                                            </v-icon>
-                                            delete
-                                        </v-btn>
-                                    </template>
-                                    <template v-slot:default="dialog">
-                                        <v-card>
-                                            <v-toolbar color="error" dark>
-                                                do you really want to delete onu?
-                                            </v-toolbar>
-                                            <v-card-actions class="justify-end">
-                                                <v-btn text
-                                                       @click="DeleteOnu() , dialog.value = false"
-                                                >
-                                                    Delete
-                                                </v-btn>
-                                                <v-spacer></v-spacer>
-                                                <v-btn
-                                                        text
-                                                        @click="dialog.value = false"
-                                                >Close
-                                                </v-btn>
-                                            </v-card-actions>
-                                        </v-card>
-                                    </template>
-                                </v-dialog>
-
-
-                            </v-row>
-                        </v-card>
-                    </v-col>
-                </v-row>
 
                 <v-row  no-gutters v-for="(i, index) in onu_info" :key="index">
                       <v-col cols12 sm12>
@@ -152,14 +54,14 @@
                 <v-flex sm12 style="overflow: auto">
 
                     <v-card>
-                        <v-container class="grey lighten-5">
+                        <v-container hover data-aos="zoom-in" data-aos-easing="ease">
 
                             <v-row no-gutters>
                                 <v-col cols="12" sm="12">
                                     <v-card class="pa-2" outlined tile>
                                         <v-container>
                                             <v-row>
-                                                <v-col cols="12" sm="4">
+                                               
                                                     <v-data-table
                                                             mobile-breakpoint="0"
                                                             :headers="headers1"
@@ -170,82 +72,75 @@
 
                                                             <tbody>
                                                             <tr v-for="(item,index) in items" :key="index">
-                                                                <td class="text-left"
-                                                                    v-for="(sts, index) in item.status_wan"
-                                                                    :key="index">
-
-                                                                    <v-icon :color="getColor(sts)">
-                                                                        mdi-ethernet mdi-36px
-                                                                    </v-icon>
-
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-
-                                                        </template>
-
-
-                                                    </v-data-table>
-                                                </v-col>
-                                                <v-col cols="12" sm="5">
-                                                    <v-data-table
-                                                            mobile-breakpoint="0"
-                                                            :headers="headers2"
-                                                            :items="onu_info"
-                                                            :hide-default-footer="true">
-
-                                                        <template v-slot:body="{ items }">
-                                                            <tbody>
-                                                            <tr v-for="(item,index) in items" :key="index">
                                                                 <td class="text-left">
-                                                                    <div style='overflow-y: auto; max-height: 200px;'>
-                                                                         <span v-for="(m, index) in item.mac_ip"
-                                                                               :key="index">
-                                                                           eth:({{ m.port }}) 
-                                                                            {{ m.mac }}
-                                                                           <a style="color:steelblue;">
-                                                                               {{ m.ip }}
-                                                                               </a> 
-                                                                               {{m.type}}
-                                                                              
-                                                                             <br>
-                                                                         </span>
+                                                                   
+
+                                                                     <div class="text-caption" style='overflow-y: auto; max-height: 200px;'>
+                                                                      <span v-for="(sts, index) in item.status_wan" :key="index">
+                                                                         <v-icon :color="getColor(sts)">mdi-ethernet mdi-36px</v-icon>
+                                                                         <h5 v-if="sts==='1'" >UP</h5>
+                                                                         <h5 v-else-if="sts==='2'">DOWN</h5>      
+                                                                      </span>
+                                                                          
                                                                     </div>
+                                                               
                                                                 </td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </template>
-                                                    </v-data-table>
-                                                </v-col>
-                                               
-                                                <v-col cols="12" sm="3">
-                                                    <v-list dense>
-                                                        <v-list-item-group color="primary">
+                                                           
+                                                                 <td>
+                                                                     <div class="text-caption" style='overflow-y: auto; max-height: 200px;'>
+                                                                     <span v-for="(m, index) in item.mac_ip" :key="index">
+                                                                          eth:({{ m.port }}) 
+                                                                            {{ m.mac }}
+                                                                           <a style="color:steelblue;">{{m.ip }}</a>
+                                                                           <br> 
+                                                                     </span>
+                                                                     
+                                                                     </div>
+                                                                 </td>
+
+                                                                 <td>
+                                                                      <v-list dense>
+                                                            <v-list-item-group color="primary">
                                                             <v-list-item v-for="(i, index) in onu_info" :key="index">
                                                                 <v-list-item-content>
+                                                                     <v-list-item-title>
+                                                                         <v-icon center color="green">mdi-router-wireless mdi-36px</v-icon>
+                                                                         <span>{{i.desc}}</span>
+                                                                    </v-list-item-title>
                                                                     <v-list-item-title>
+                                                                        <v-icon>mdi-signal</v-icon>
                                                                         rx: <span v-html="getSignal(i.signal_rx)"/>
                                                                     </v-list-item-title>
                                                                     <v-list-item-title>
-                                                                        <span>
-                                                                             tx: {{i.signal_tx}}
-                                                                        </span>
+                                                                        <v-icon>mdi-signal</v-icon>
+                                                                        <span>tx: {{i.signal_tx}}</span>
                                                                     </v-list-item-title>
-                                                                    <v-list-item-title>distace: {{i.distance}} m
+                                                                    <v-list-item-title>
+                                                                        <v-icon>mdi-map-marker-distance</v-icon>
+                                                                        <span>distace: {{i.distance}} m</span>
                                                                     </v-list-item-title>
-                                                                    <v-list-item-title>volt: {{i.volt}}
+                                                                    <v-list-item-title>
+                                                                         <v-icon>mdi-lightning-bolt-outline</v-icon>
+                                                                        volt: {{i.volt}}
                                                                     </v-list-item-title>
-                                                                     <v-list-item-title>temp: {{i.temp}}
+                                                                     <v-list-item-title>
+                                                                         <v-icon>mdi-coolant-temperature</v-icon>
+                                                                         temp: {{i.temp}}
                                                                     </v-list-item-title>
-                                                                    <v-list-item-title>log: {{i.log}}
-                                                                    </v-list-item-title>
-                                                                    <v-list-item-title>desc: {{i.desc}}
+                                                                    <v-list-item-title>
+                                                                        <v-icon>mdi-clipboard-edit-outline</v-icon>
+                                                                        <span>{{i.log}}</span>
                                                                     </v-list-item-title>
                                                                 </v-list-item-content>
                                                             </v-list-item>
                                                         </v-list-item-group>
                                                     </v-list>
-                                                </v-col>
+                                                    </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </template>
+                                                    </v-data-table>
+                                               
                                             </v-row>
                                         </v-container>
 
@@ -257,13 +152,13 @@
                     </v-card>
 
 
-                    <v-btn fab dark fixed bottom left color="green"
+                    <v-btn fab dark fixed bottom left color="rgb(50, 205, 50, 0.7)"
                            @click="BackToHome()">
                         <v-icon>mdi-arrow-collapse-left</v-icon>
                     </v-btn>
 
                     <v-btn v-scroll="onScroll" v-show="fab" fab
-                           dark fixed bottom right color="green"
+                           dark fixed bottom right color="rgb(50, 205, 50, 0.7)"
                            @click="toTop">
                         <v-icon>mdi-arrow-up</v-icon>
                     </v-btn>
@@ -278,17 +173,19 @@
 </template>
 
 <script>
-    let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
+   
     export default {
         data() {
             return {
                 alert: {'value': false, 'color': '', 'message': ''},
                 headers1: [
-                    {text: 'Status-Eth', width: '28%'},
+                    {text: 'Status-Eth', width: '18%'},
+                    {text: 'Port/Mac-Address/Ip/Vid', width: '42%'},
+                    {text: 'Info', width: '40%'},
                 ],
-                headers2: [
-                    {text: 'Mac-Address info d(dynamic) s(static)', width: '40%'},
-                ],
+                // headers2: [
+                //     {text: 'Mac-Address info', width: '40%'},
+                // ],
                
                 loading: false,
                 interval: {},
@@ -317,43 +214,13 @@
                     this.error = 'ERROR'
                 })
                 this.onu_info = response6.data.data
+                console.log(this.onu_info)
                 
                 }
                 this.loading = false
                 },
 
-             async DeleteOnu() {
-             const response7 = await this.$api.auth.OnuDelete(this.deviceIp, this.OnuId).catch(() => {
-                    this.error = 'ERROR'
-                })
-                
-              if (response7.status === 200) {
-                        sound.play()
-                        this.alert['value'] = true
-                        this.alert['color'] = 'red'
-                        this.alert['message'] = 'onu successfully deleted'
-                        window.setInterval(() => {
-                            this.alert['value'] = false;
-                            console.log("hide alert after 5 seconds");
-                        }, 5000)
-                    }
-            },
-             async RebootOnu() {
-             const response8 = await this.$api.auth.OnuReboot(this.deviceIp, this.OnuId).catch(() => {
-                    this.error = 'ERROR'
-                })
-                
-              if (response8.status === 200) {
-                        sound.play()
-                        this.alert['value'] = true
-                        this.alert['color'] = 'cyan'
-                        this.alert['message'] = 'onu successfully rebooted'
-                        window.setInterval(() => {
-                            this.alert['value'] = false;
-                            console.log("hide alert after 5 seconds");
-                        }, 5000)
-                    }
-         },    
+            
 
             getIpFromQuery() {
                 console.log(this.$route);
