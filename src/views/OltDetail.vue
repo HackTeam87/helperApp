@@ -38,104 +38,18 @@
 
                 <v-flex sm12 style="overflow: auto">
                     <v-card>
-
+ 
+ 
                         <v-container class="grey lighten-5">
-                             <v-list-group :value="list_group" prepend-icon="mdi-sitemap">
-                                
-                                     <template v-slot:activator >
-                                      <v-list-item-title > 
-                                           <div class="text-caption">
-                                                <span class="white"> pon online status</span>
-                                           </div>
-                                          </v-list-item-title>
-                                      </template>
 
-                            <v-row no-gutters>
+                                <v-spacer v-if="tree && !loading">
+                                 <span v-if="this.all_info" class="text-caption" style="color:grey;">total onu: {{this.all_info.length}} / </span>
+                                 <span v-if="this.Test" class="text-caption" style="color:red;">offline onu: {{this.all_info.length - this.Test}} / </span>
+                                 <span v-if="this.Test" class="text-caption" style="color:green;">online onu: {{this.Test}} / </span>
+                                 <span v-if="this.eth_info" class="text-caption" style="color:grey;">total eth: {{this.eth_info.length}}</span>
+                                </v-spacer>
 
-                                <v-col cols="12" sm="3" v-for="(c, index) in port_onu_count" :key="index">
-                                    <v-card class="v-card__title font-weight-medium headline" hover data-aos="zoom-in" data-aos-easing="ease">
-                                        <v-icon center :color="getColor(c.pon_status)">mdi-sitemap mdi-24px </v-icon> 
-                                        <v-slider
-                                                
-                                                v-model="c.onu_count"
-                                                :label="c.port_id"
-                                                :thumb-color="PortOnuCount(c.onu_count)"
-                                                :max="c.port_holding"
-                                                thumb-label="always"
-                                                readonly
-                                                track-fill-color="green"
-                                        >
-                                        </v-slider> 
-
-                                         <span class="text-caption"  v-if="c.port_tx_power">
-                                            <v-icon :color="getColor(c.pon_status)">mdi-signal</v-icon>
-                                            tx: {{c.port_tx_power}} 
-                                             <v-icon :color="getColor(c.pon_status)">mdi-lightning-bolt-outline</v-icon>
-                                            {{c.port_volt}}
-                                         </span>
-
-                                       
-                                    </v-card>
-                                </v-col>
-                            </v-row>
-                             </v-list-group>
-
-                              <v-list-group :value="list_group" prepend-icon="mdi-monitor">
-                                     <template v-slot:activator >
-                                      <v-list-item-title> 
-                                          <div class="text-caption">
-                                                <span class="white"> ethernet online status</span>
-                                           </div>
-                                      </v-list-item-title>
-                                     </template>
-                            <v-row no-gutters>
-
-                               <v-card class="v-card__title text-caption">
-                                    <span class="text-caption headline"  outlined tile v-for="(eth, index) in eth_info" :key="index">
-                                            <v-icon :color="getColor(eth.eth_status)">mdi-ethernet mdi-24px</v-icon>
-                                        <span>{{eth.eth_name}}</span>
-                                    </span>
-                               </v-card>
-
-                            </v-row>
-                            </v-list-group>
-                              
-                                        
-                                        <v-spacer v-if="tree">
-                                           <v-chip class="text-caption"  color="blue-grey" label outlined >
-                                             <span v-if="this.all_info">total onu: {{this.all_info.length}}</span>
-                                             <span v-else></span>
-                                           </v-chip>
-
-                                           <v-chip class="text-caption"  color="green" label outlined >
-                                             <span v-if="this.Test">online onu: {{this.Test}}</span>
-                                             <span v-else></span>
-                                           </v-chip>
-
-                                            <v-chip class="text-caption"  color="blue-grey" label outlined >
-                                             <span v-if="this.eth_info">total eth: {{this.eth_info.length}}</span>
-                                             <span v-else></span>
-                                           </v-chip>
-                                        </v-spacer>
-                                       
-
-                             <v-container >
-                            <v-row align="center" justify="space-around">
-
-                                <v-btn block dark class="ma-2"  color="green" @click="GetTree()" v-if="!tree">
-                                    tree update
-                                     <v-icon center>mdi-share</v-icon>
-                                </v-btn>
-    
-                            </v-row>
-                             </v-container>
-
-                        </v-container>
-
-
-                        <v-card v-if="tree">
-                            
-                            <v-card-title>
+                              <v-card-title v-if="tree">
                                  <v-text-field
                                         v-model="search"
                                         append-icon="mdi-magnify"
@@ -146,17 +60,57 @@
 
                                  <v-spacer></v-spacer>
                                 
-                                 <v-spacer>
-                                      <v-btn block dark  color="green" @click="GetTree()" >
-                                    tree update
-                                     <v-icon center>mdi-share</v-icon>
-                                </v-btn>
-                                </v-spacer>
-                               
-
-                               
                             </v-card-title>
-                            <v-data-table
+
+                            <v-row no-gutters>
+
+                                <v-col cols="12" sm="4" v-for="(c, index) in port_onu_count" :key="index">
+
+                                 <v-list-group :value="c.onu_count" >
+                                
+                                     <template v-slot:activator >
+                                      <v-list-item-title > 
+                                                 
+                                                <v-icon center :color="getColor(c.pon_status)">mdi-sitemap mdi-24px </v-icon> 
+                                                 {{c.port_id}}
+                                                 
+                                           
+                                          </v-list-item-title>
+                                      </template>
+
+                                    <v-card class="v-card__title font-weight-medium headline" hover data-aos="zoom-in" data-aos-easing="ease"
+                                    :disabled="c.onu_count === 0"
+                                    @click="GetTree()"
+                                    style="border-bottom-width: 1px;border-bottom-color: green;border-bottom-style: solid;" 
+                                    >
+                                    
+                                         <v-icon center>mdi-share</v-icon>
+                                         <span v-html="operStatus(c.pon_oper_status)"  class="text-caption"></span>
+                                         
+                                        <v-slider
+                                                v-model="c.onu_count"
+                                                :thumb-color="PortOnuCount(c.onu_count)"
+                                                :max="c.port_holding"
+                                                thumb-label="always"
+                                                readonly
+                                                track-fill-color="green"
+                                        >
+                                        </v-slider> 
+
+
+                                         <span class="text-caption"  v-if="c.port_tx_power">
+                                            <v-icon :color="getColor(c.pon_status)">mdi-signal</v-icon>
+                                            tx: {{c.port_tx_power}} 
+                                             <v-icon :color="getColor(c.pon_status)">mdi-lightning-bolt-outline</v-icon>
+                                            {{c.port_volt}}
+                                         </span>
+                                 
+                                        
+                                    </v-card>
+                              
+                           
+                                 <v-data-table
+                                    v-if="tree && c.onu_count !== 0 && !loading"
                                     primary
                                     mobile-breakpoint="0"
                                     :headers="headers"
@@ -165,13 +119,17 @@
                                     sort-by="up/down"
                                     :footer-props="footerProps"
                                     class="elevation-1"
+                                    :hide-default-footer="true"
                             >
-    
+                               
                                 <template v-slot:body="{ items }">
     
-                                    <tbody>
-                                    <tr v-for="(item,index) in items" :key="index">
-                                        <td class="text-left">
+                                    <tbody v-for="(item,index) in items" :key="index">
+                                         
+                                    <tr   v-if="c.port_id === item.port.split(':', 1)[0]" >
+                                          
+                                        <td class="text-left" >
+                                          
 
                                         <v-dialog
                                         transition="dialog-top-transition"
@@ -179,11 +137,11 @@
 
                                     <template v-slot:activator="{ on, attrs }" >
                                         <v-btn class="text-caption" dark color="blue darken-1" v-bind="attrs" v-on="on" :disabled="item.onu_status === '2'">
-                                          
+        
                                             <v-icon>
                                                 mdi-reload
                                             </v-icon>
-                                             {{ item.port}}
+                                             {{ item.port }}
                                         </v-btn>
                                     </template>
                                     <template v-slot:default="dialog">
@@ -280,15 +238,48 @@
     
                                 </template>
     
-    
                             </v-data-table>
-                        </v-card>
+                             </v-list-group>
 
-               <v-container >
+                        </v-col>
+                            </v-row>
+
+
+                              <v-list-group :value="list_group" prepend-icon="mdi-monitor">
+
+                                     <template v-slot:activator >
+                                      <v-list-item-title> 
+                                          <div class="text-caption">
+                                                <span class="white"> ethernet online status</span>
+                                           </div>
+                                      </v-list-item-title>
+                                     </template>
+
+                               <v-row no-gutters>
+
+                               <v-card class="v-card__title text-caption">
+                                    <span class="text-caption headline"  outlined tile v-for="(eth, index) in eth_info" :key="index">
+                                          
+                                           <v-icon :color="getColor(eth.eth_status)">mdi-ethernet mdi-24px</v-icon>
+                                            <span v-html="operStatus(eth.eth_oper_status)"></span>
+                                           {{eth.eth_name}} &nbsp;
+
+                                    </span>
+                               </v-card>
+
+                               </v-row>
+
+                               </v-list-group>
+                              
 
                             
-                             <v-list-group value="some_value" >
-                                  <template v-slot:activator>
+                           
+                                
+                           
+                            
+                        </v-container>
+                       <v-list-group :value="list_group" >
+                         <template v-slot:activator>
                                 <v-list-item-title> 
                                     <div class="text-caption" >
                                         <span  v-for="(d, index) in base_info" :key="index" >{{d.desc}}</span>          
@@ -309,11 +300,6 @@
                                 </v-col>
                                  </v-row>
                                </v-list-group>
-                           
-                            
-                        </v-container>
-
-                       
                      
 
 
@@ -344,6 +330,7 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
             return {
                 
                 alert: {'value': false, 'color': '', 'message': ''},
+                
                 list_group: true,
                 some_value: true,
                 loading: false,
@@ -356,9 +343,9 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                 deviceIp: '',
                 tree: false,
                 Test: '',
-                footerProps: {'items-per-page-options': [150, 250, -1]},
+                footerProps: {'items-per-page-options': [-1, -1, -1]},
                 headers: [
-                    {text: 'control/up/down', width: "50%", show: true, value: ''},
+                    {text: 'control', width: "50%", show: true, value: ''},
                     {text: 'info', width: "50%", show: true, value: ''},  
                 ],
                 ex3: {label: 'thumb-color', val: 50, color: 'red'},
@@ -376,6 +363,7 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                 this.GetInfo();
             }},
      methods: {
+        
          async GetInfo() {
               this.loading = true
                 const response1 = await this.$api.auth.OltBase(this.deviceIp).catch(() => {
@@ -395,10 +383,13 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                 this.port_onu_count = response3.data.data
                 
                 let test = parseInt(0);
+               
                 for (let i = 0; i < this.port_onu_count.length; i++) {
                   test = test + parseInt(this.port_onu_count[i].onu_count)
+                 
                   }
-                  
+
+                 
                  this.Test = test
                  this.loading = false
             },
@@ -411,7 +402,8 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                 })
                 this.all_info = response4.data.data
                 this.list_group = false
-                this.loading = false   
+                this.loading = false 
+                 
          },
          async DeleteOnu(OnuId) {
              const response5 = await this.$api.auth.OnuDelete(this.deviceIp, OnuId).catch(() => {
@@ -454,10 +446,19 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
                 if (status === '1' || status === 1) return 'green'
                 else return 'error'
             },
+            operStatus(d) {
+                if (d === '10000000') return '<br><span style="color: darkgreen">10M-Full</span><br>';
+                if (d === '100000000') return '<br><span style="color: darkgreen">100M-Full</span><br>';
+                if (d === '1000000000') return '<br><span style="color: darkgreen">1G-Full</span><br>';
+                if (d === '2500000000') return '<br><span style="color: darkgreen">2.3G-Full</span><br>';
+                if (d === '4294967295') return '<br><span style="color: darkgreen">10G-Full</span><br>';
+                if (d === '0') return '<br><span style="color: darkgray; font-weight: bold">Disable</span><br>';
+                return d;
+            },
             PortOnuCount(count) {
-                if (count < '45' || count < 45) return 'green'
-                if (count >= '45' && count <= '55' || count >= 45 && count <= 55) return 'orange'
-                if (count >= '56' || count >= 56) return 'error'
+                if (count < '45' || count < 45) return 'rgb(50, 205, 50, 0.75)'
+                if (count >= '45' && count <= '55' || count >= 45 && count <= 55) return 'rgb(255,140,0,0.75)'
+                if (count >= '56' || count >= 56) return 'rgb(255,0,0, 0.75)'
                 else return 'gray'
             },
             getSignal(signal) {
@@ -516,7 +517,7 @@ let sound = new Audio(require('@/assets/mp3/twitter_whistle.mp3'))
 
                 console.log(route)
             },},
-            computed: {
+            computed: {   
             filteredItems() {
                 return this.all_info.filter((i) => {
                     return !this.search || (i.port + '||' + i.onu_mac_serial + '||' + i.user_mac + '||' + 

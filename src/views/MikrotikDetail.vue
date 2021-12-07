@@ -1,6 +1,7 @@
 <template>
     <div>
  <v-container>
+      
    <v-row  no-gutters v-for="(i, index) in base_info" :key="index">
                       <v-col cols12 sm12>
                      <v-list-group :value="false" prepend-icon="mdi-router-network">
@@ -11,30 +12,31 @@
       
                   
                         <v-card class="pa-2" outlined tile hover data-aos="zoom-in" data-aos-easing="ease">
+                           
                             <v-row >
-                                <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                <v-chip class="text-caption ma-2" label color="teal darken-4" text-color="white">
                                     <span>{{ i.name }}</span>
                                 </v-chip>
-                                <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                <v-chip class="text-caption ma-2" label color="rgb(50, 205, 50, 0.7)" text-color="white">
                                     <span>{{ i.location }}</span>
                                 </v-chip>
-                                <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                <v-chip class="text-caption ma-2" label color="teal darken-4" text-color="white">
                                     <span>{{ i.uptime }}</span>
                                 </v-chip>
-                                <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                <v-chip class="text-caption ma-2" label color="teal darken-4" text-color="white">
                                     <span>{{ i.cpu }}</span>
                                 </v-chip>
-                                <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                <v-chip class="text-caption ma-2" label color="teal darken-4" text-color="white">
                                     <span>{{ i.temperature }}</span>
                                 </v-chip>
-                                  <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                  <v-chip class="text-caption ma-2" label color="teal darken-4" text-color="white">
                                     <span>{{ i.memory_total }}</span>
                                 </v-chip>
-                                  <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                  <v-chip class="text-caption ma-2" label color="teal darken-4" text-color="white">
                                     <span>{{ i.memory_used }}</span>
                                 </v-chip>
                                
-                                  <v-chip class="ma-2" label color="teal darken-4" text-color="white">
+                                  <v-chip class="text-caption ma-2" label color="rgb(50, 205, 50, 0.7)" text-color="white">
                                     <span>{{ i.soft }}</span>
                                 </v-chip>
                             </v-row>
@@ -55,7 +57,7 @@
                    
                         <v-card class="pa-2" outlined tile hover data-aos="zoom-in" data-aos-easing="ease">
                             <v-row >
-                                <v-chip v-for="v in detail_info" :key="v.id" class="ma-2" label color="teal darken-4" text-color="white">
+                                <v-chip v-for="v in detail_info" :key="v.id" class="text-caption ma-2" label color="teal darken-4" text-color="white">
                                     <span>{{ v.vlan }}</span>
                                 </v-chip>
                             </v-row>
@@ -72,7 +74,7 @@
   <v-container>
     <v-card >
 
-                       <v-card-title>
+                       <v-card-title class="text-caption">
                                 <span class="colors-blue">D-Dynamic</span>
                                  <v-spacer></v-spacer>
                                 <span class="colors-violet">R-Radius</span>
@@ -108,26 +110,59 @@
                                     <tbody>
                                     <tr v-for="(item,index) in items" :key="index">
 
-                                        <td class="text-left">
-                                             <span v-if="item['dynamic'] === 'true'" class="colors-blue">D</span>
+                                        <td class="text-caption text-left">
+                                            <v-icon>mdi-information-variant</v-icon>
+
+                                            <span v-if="item['dynamic'] === 'true'" class="colors-blue">D</span>
                                              <span v-else class="colors-black">S</span>
                                              <span v-if="item['radius'] === 'true'" class="colors-violet">R</span>
                                              <span v-if="item['blocked'] === 'true'" class="colors-black">B</span>
                                              <span v-if="item['disabled'] === 'true'" class="colors-gray">X</span>
-                                        </td>
-                                        <td class="text-left">{{ item['host-name'] }}</td>
-                                        <td class="text-left">{{ item['address'] }}</td>
-                                        <td class="text-left">{{ item['mac-address'] }}</td>
-                                        <td class="text-left">{{ item['server'] }}</td>
-                                        <td class="text-left" >
+                                             status: 
                                             <span v-if="item['status'] === 'bound'" class="colors-green"> {{ item['status'] }}</span>
                                             <span v-else class="colors-red"> {{ item['status'] }}</span>
                                         </td>
-                                        <td class="text-left">{{ item['last-seen'] }}</td>
-                                        <td class="text-left">{{ item['expires-after'] }}</td>
-                                        <td class="text-left">{{ item['comment'] }}</td>
-                                        <td class="text-left">{{ item['dhcp-option'] }}</td>
-                                        <td class="text-left">{{ item['address-lists'] }}</td>
+                                        <td class=" text-caption text-left">
+                                            <v-icon>mdi-lan-connect</v-icon>
+                                            host-name: {{ item['host-name'] }}
+                                            <br>
+                                            <v-icon>mdi-numeric</v-icon>
+                                            address: 
+                                            {{ item['address'] }}
+                                             <br> 
+                                            <v-icon>mdi-alphabetical</v-icon>
+                                            mac-address: 
+                                            {{ item['mac-address'] }}
+                                            <br>
+                                            <v-icon>mdi-server-network</v-icon>
+                                            server: {{ item['server'] }}
+                                            <br>
+                                            <v-icon>mdi-content-paste</v-icon>
+                                              comment: {{ item['comment'] }}
+                                            <br>
+                                        </td>
+
+                                        <td class=" text-caption text-left">
+                                             <v-icon>mdi-format-list-checks</v-icon>
+                                            address-lists: {{ item['address-lists'] }}
+                                             <br>
+                                            <v-icon>mdi-numeric</v-icon>
+                                            active-address: 
+                                            {{ item['active-address'] }}
+                                            <br> 
+                                             <v-icon>mdi-alphabetical</v-icon>
+                                            active-mac-address: 
+                                            {{ item['active-mac-address'] }}
+                                            <br>
+                                            <v-icon>mdi-account-search</v-icon>
+                                            last-seen: {{ item['last-seen'] }}
+                                            <br>
+                                            <v-icon>mdi-rotate-right</v-icon>
+                                            expires-after: {{ item['expires-after'] }}
+                                            <br>
+                                            <v-icon>mdi-flag-outline</v-icon>
+                                            dhcp-option: {{ item['dhcp-option'] }}
+                                        </td>
                                    
                                        
                                     </tr>
@@ -138,13 +173,13 @@
                             </v-data-table>
                         </v-card>
 
-                         <v-btn fab dark fixed bottom left color="green"
+                         <v-btn fab dark fixed bottom left color="rgb(50, 205, 50, 0.7)"
                            @click="BackToHome()">
                         <v-icon>mdi-arrow-collapse-left</v-icon>
                     </v-btn>
 
                     <v-btn v-scroll="onScroll" v-show="fab" fab
-                           dark fixed bottom right color="green"
+                           dark fixed bottom right color="rgb(50, 205, 50, 0.7)"
                            @click="toTop">
                         <v-icon>mdi-arrow-up</v-icon>
                     </v-btn>
@@ -164,19 +199,10 @@
     detail_info: [],
     api_info: [],
     headers: [      
-                    {text: 'flags', width: "5%", show: true, value: ''},
-                    {text: 'host-name', width: "10%", show: true, value: ''},
-                    {text: 'address', width: "10%", show: true, value: ''},
-                    {text: 'mac-address', width: "10%", show: true, value: ''},
-                    {text: 'server', width: "10%", show: true, value: ''},
-                    {text: 'status', width: "5%", show: true, value: ''},
-                    {text: 'last-seen', width: "10%", show: true, value: ''},
-                    {text: 'expires-after', width: "10%", show: true, value: ''},
-                    {text: 'comment', width: "10%", show: true, value: ''},
-                    {text: 'dhcp-option', width: "10%", show: true, value: ''},
-                    {text: 'address-lists', width: "10%", show: true, value: ''},
+                    {text: 'flags', width: "20%", show: true, value: ''},
+                    {text: 'info', width: "40%", show: true, value: ''},
+                    {text: 'other', width: "40%", show: true, value: ''},
                     
-
                     //  {text: 'active-address', width: "6%", show: true, value: ''},
                     // {text: 'active-client-id', width: "6%", show: true, value: ''},
                     // {text: 'active-mac-address', width: "6%", show: true, value: ''},
